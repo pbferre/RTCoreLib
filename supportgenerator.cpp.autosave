@@ -63,7 +63,7 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
     ModelEntity* m = 0;
     foreach (ModelEntity* me, MVM->listModelEntities)
     {
-        if (m->supportModelVisual3D == hitModel || m->modelVisual3D == hitModel)
+        if (me. == hitModel || m->modelVisual3D == hitModel)
         {
             m = me;
             break;

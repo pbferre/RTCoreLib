@@ -4,6 +4,10 @@
 //#include "supportgenerator.h"
 #include "aabbtree.h"
 #include "distancetransform.h"
+#include "support.h"
+#include "mvmparameters.h"
+
+class SupportGenerator;
 
 namespace CreateCore
 {
@@ -19,21 +23,32 @@ public:
     ModelVisual3DObservable* ModelVisual3D() { return modelVisual3D; }
     void setModelVisual3D(ModelVisual3DObservable* value) { modelVisual3D = value; }
 
+    Model3DGroup* ModelGroup() { return modelGroup; }
+    void setModelGroup(Model3DGroup* value) { modelGroup = value; }
+
     AABBTree* Tree() { return aabbTree; }
     void GenerateAABBTree();
 
     DistanceTransform* DistTransform() { return distanceTransform; }
     void GenerateDistanceTransform();
 
-    int PositionsHash;
+    long PositionsHash;
+    void GenerateSupportsPrep(MVMParameters params, SupportOperationType sot, QList<Point3D> positions, Rect3D bounds);
+
+    SupportGenerator* modelSupports;
+
+    void GetSingleSupportEntity(Point3D mouse);
 
 private:
     ModelVisual3DObservable* supportModelVisual3D;
     ModelVisual3DObservable* modelVisual3D;
-    Model3DGroup modelGroup;
+    Model3DGroup* modelGroup;
 
     AABBTree* aabbTree;
     DistanceTransform* distanceTransform;
+
+    QList<Point3D> _positions;
+    Rect3D _bounds;
 };
 
 }

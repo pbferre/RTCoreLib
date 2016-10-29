@@ -1,6 +1,14 @@
 #include "mainviewmodel.h"
+#include "modelentity.h"
 
 using namespace CreateCore;
+
+bool littleEndian()
+{
+    short int word = 0x0001;
+    char *byte = (char *) &word;
+    return(byte[0] ? true : false);
+}
 
 MainViewModel::MainViewModel()
 {
@@ -23,15 +31,15 @@ long MainViewModel::doubleToInt64Bits(double val)
     return b2.toLong(0, 16);
 }
 
-int MainViewModel::GetPositionsHash(QList<Point3D> positions)
+long MainViewModel::GetPositionsHash(QList<Point3D> positions)
 {
     int hash = 17;
-    for (int i = 0; i < positions.Count; i++)
+    for (int i = 0; i < positions.count(); i++)
     {
         long x = doubleToInt64Bits(positions.at(i).x());
         long y = doubleToInt64Bits(positions.at(i).y());
         long z = doubleToInt64Bits(positions.at(i).z());
-        int r = 17;
+        long r = 17;
         r = 37 * r + (int)(x ^ (x >> 32));
         r = 37 * r + (int)(y ^ (y >> 32));
         r = 37 * r + (int)(z ^ (z >> 32));
@@ -47,7 +55,7 @@ void MainViewModel::SupportEntityPrep(QList<Point3D> positions, Rect3D bounds, Q
     try
     {
         QList<Point3D> d(positions);
-        int hash = GetPositionsHash(d);
+        long hash = GetPositionsHash(d);
 
         qDebug() << "hash: " << hash;
         if (!listModelEntities.isEmpty())
@@ -57,47 +65,41 @@ void MainViewModel::SupportEntityPrep(QList<Point3D> positions, Rect3D bounds, Q
                 if (me->PositionsHash == hash)
                 {
                     currentEntity = me;
-                    currentEntity
+                    currentEntity->GenerateSupportsPrep(parameters, sot, positions, bounds);
                     return;
                 }
             }
-
-            var existing = ListModelEntities.Where(o => o.PositionsHash == hash);
-            if (existing.Any())
-            {
-                Console.WriteLine("existing match: " + hash);
-                CurrentEntity = existing.First();
-                CurrentEntity.GenerateSupportsPrep(Instance, supportOperationType, positions, bounds);
-                return;
-            }
         }
 
-        ModelEntity modelEntity = new ModelEntity();
-        modelEntity.PositionsHash = hash;
+        ModelEntity* modelEntity = new ModelEntity();
+        modelEntity->PositionsHash = hash;
+        listModelEntities.append(modelEntity);
 
-        if (ListModelEntities != null)
-        {
-            ListModelEntities.Add(modelEntity);
-        }
-        else
-        {
-            ListModelEntities = new List<ModelEntity>() { modelEntity };
-        }
+        Model3DGroup* mg = new Model3DGroup();
+        GeometryModel3D* gm3d = new GeometryModel3D();
+        MeshGeometry3D* mg3d = new MeshGeometry3D();
+        mg3d->Positions = positions;
+        gm3d->Geometry = mg3d;
+        mg->Children.append(gm3d);
+        modelEntity->setModelGroup(mg);
 
-        modelEntity.Model = new Model3DGroup();
-        modelEntity.Model.Children = new List<Model3D>();
-        modelEntity.Model.Children.Add(new GeometryModel3D() { Geometry = new MeshGeometry3D() { Positions = d, } });
+        ModelVisual3DObservable* mv = new ModelVisual3DObservable();
+        mv->Content = modelEntity->ModelGroup()->Children.first();
+        modelEntity->setModelVisual3D(mv);
 
-        modelEntity.ModelVisual3D = new ModelVisual3DObservable();
-        modelEntity.ModelVisual3D.Content = modelEntity.Model.Children.First();
+        modelEntity->GenerateAABBTree();
+        modelEntity->GenerateDistanceTransform();
+        modelEntity->GenerateSupportsPrep(MVM->Parameters(), sot, positions, bounds);
+        currentEntity = modelEntity;
 
-        CurrentEntity = modelEntity;
-        modelEntity.GenerateAABBTree();
-        modelEntity.GenerateDistanceTansform();
-        modelEntity.GenerateSupportsPrep(Instance, supportOperationType, positions, bounds);
     }
     catch (...)
     {
 
     }
+}
+
+void MainViewModel::GetSingleSupport(Point3D mouse)
+{
+    currentEntity->GetSingleSupportEntity(mouse);
 }

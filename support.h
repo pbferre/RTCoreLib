@@ -20,6 +20,16 @@ namespace ublas = boost::numeric::ublas;
 namespace CreateCore
 {
 
+enum SupportOperationType
+{
+    sotElevateNoBase = 0,
+    sotSingleBaseWithSupports,
+    sotSingleBaseNoSupports,
+    sotBasePerSupport,
+    sotNone
+};
+
+
 struct TransformState
 {
     double SupportOffsetX;
@@ -83,7 +93,7 @@ bool operator ==(Transform3D t1, Transform3D t2)
     return (t1.OffsetX == t2.OffsetX) && (t1.OffsetY == t2.OffsetY);
 }
 
-class Transform3DGroup : Transform3D
+class Transform3DGroup : public Transform3D
 {
 public:
     QList<Transform3D> Children;
@@ -123,20 +133,20 @@ public:
     Transform3D Transform;
 };
 
-class Model3DGroup : Model3D
+class Model3DGroup : public Model3D
 {
 public:
     QList<Model3D*> Children;
 };
 
-class GeometryModel3D : Model3D
+class GeometryModel3D : public Model3D
 {
 public:
     MeshGeometry3D* Geometry;
 
 };
 
-class ModelVisual3D : Visual3D
+class ModelVisual3D : public Visual3D
 {
 public:
     Transform3D* Transform;
@@ -153,7 +163,7 @@ public:
     }
 };
 
-class ModelVisual3DObservable : ModelVisual3D
+class ModelVisual3DObservable : public ModelVisual3D
 {
 public:
 
@@ -244,7 +254,7 @@ class Rotation3D
 
 };
 
-class AxisAngleRotation3D : Rotation3D
+class AxisAngleRotation3D : public Rotation3D
 {
 public:
     AxisAngleRotation3D(Vector3D axis, double length)
@@ -254,7 +264,7 @@ public:
 };
 
 
-class RotateTransform3D : Transform3D
+class RotateTransform3D : public Transform3D
 {
 
 public:

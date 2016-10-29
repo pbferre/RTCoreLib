@@ -6,10 +6,13 @@
 #include "vector3d.h"
 #include "support.h"
 //#include "modelentity.h"
-#include "mainviewmodel.h"
+#include "meshbuilder.h"
+//#include "mainviewmodel.h"
+#include "mvmparameters.h"
 
 namespace CreateCore
 {
+class ModelEntity;
 
 class SupportGenerator
 {
@@ -23,6 +26,7 @@ public:
     static ModelEntity* GetModelEntityFromHitModel(Visual3D* hitModel);
     static int Top;
     static int Bottom;
+    static double IntersectionSafetyDistance;
 
 private:
      QList<QPointF> hitList;
@@ -35,8 +39,6 @@ private:
      QList<Point3D> positions;
      QList<QList<QList<Point3D>>> supportSlicePoints;
      Point3D mouse;
-
-     static double IntersectionSafetyDistance = 0.4;
 
      double baseSupportHeight;
      double layerThickness;

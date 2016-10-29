@@ -3,19 +3,13 @@
 
 #include "point3d.h"
 #include "mvmparameters.h"
-#include "modelentity.h"
+//#include "modelentity.h"
+#include "support.h"
 
 namespace CreateCore
 {
 
-enum SupportOperationType
-{
-    sotElevateNoBase = 0,
-    sotSingleBaseWithSupports,
-    sotSingleBaseNoSupports,
-    sotBasePerSupport,
-    sotNone
-};
+class ModelEntity;
 
 class MainViewModel
 {
@@ -35,13 +29,15 @@ public:
 
     ModelEntity* CurrentEntity() { return currentEntity; }
 
+    void GetSingleSupport(Point3D mouse);
+
 private:
     MVMParameters parameters;
     ModelEntity* currentEntity;
 
     int numSlices;
 
-    int GetPositionsHash(QList<Point3D> positions);
+    long GetPositionsHash(QList<Point3D> positions);
     long doubleToInt64Bits(double val);
 };
 

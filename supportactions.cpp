@@ -60,8 +60,7 @@ void SupportActions::AddManualPoints(float *vec3Array, int length)
 
     SliceMesh* mesh = meshList.at(0);
 
-    SupportEntityPrep sep(mesh.positions, mesh.bounds, mesh.transformM44);
-
+    MVM->SupportEntityPrep(mesh->positions, mesh->bounds, mesh->transformM44);
 
     QList<Point3D> m;
     for (int num = 0; num < length; num += 3)
@@ -72,7 +71,8 @@ void SupportActions::AddManualPoints(float *vec3Array, int length)
 
     QElapsedTimer et;
     et.start();
-    MainViewModel.mvm.GetSingleSupport(m[0]);
+
+    MVM->GetSingleSupport(m[0]);
 
     qDebug() << "Single Support total ms within mono: " + et.elapsed();
     length = MVM->CylinderPaths.count();

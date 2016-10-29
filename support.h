@@ -93,6 +93,11 @@ public:
     }
 };
 
+bool operator ==(Transform3DGroup t1, Transform3DGroup t2)
+{
+    return t1.Children == t2.Children;
+}
+
 class Visual3D
 {
 public:
@@ -120,21 +125,21 @@ public:
 class Model3DGroup : Model3D
 {
 public:
-    QList<Model3D> Children;
+    QList<Model3D*> Children;
 };
 
 class GeometryModel3D : Model3D
 {
 public:
-    MeshGeometry3D Geometry;
+    MeshGeometry3D* Geometry;
 
 };
 
 class ModelVisual3D : Visual3D
 {
 public:
-    Transform3D Transform;
-    Model3D Content;
+    Transform3D* Transform;
+    Model3D* Content;
 };
 
 class Vertex
@@ -143,7 +148,7 @@ public:
     double* Position;
     Vertex(Point3D point)
     {
-        Position = new double[3] { point.X, point.Y, point.Z };
+        Position = new double[3] { point.x(), point.y(), point.z() };
     }
 };
 
@@ -151,10 +156,10 @@ class ModelVisual3DObservable : ModelVisual3D
 {
 public:
 
-    GeometryModel3D GetGeometryModel()
+    GeometryModel3D* GetGeometryModel()
     {
-        Model3DGroup group = (Model3DGroup)this->Content;
-        return (GeometryModel3D)group.Children.at(0);
+        Model3DGroup* group = dynamic_cast<Model3DGroup*>(this->Content);
+        return dynamic_cast<GeometryModel3D*>(group->Children.at(0));
     }
 };
 
@@ -169,7 +174,7 @@ public:
         _vertexIndex2 = 0;
         _vertexIndex3 = 0;
         _pointHit = Point3D();
-        _meshHit = MeshGeometry3D();
+        _meshHit = new MeshGeometry3D();
     }
 
     RayHitResult(double height)
@@ -180,10 +185,10 @@ public:
         _vertexIndex2 = 0;
         _vertexIndex3 = 0;
         _pointHit = Point3D();
-        _meshHit = MeshGeometry3D();
+        _meshHit = new MeshGeometry3D();
     }
 
-    RayHitResult(MeshGeometry3D meshHit, Point3D pointHit, double distanceToRayOrigin,
+    RayHitResult(MeshGeometry3D* meshHit, Point3D pointHit, double distanceToRayOrigin,
                  int vertexIndex1, int vertexIndex2, int vertexIndex3)
     {
 
@@ -206,14 +211,14 @@ public:
     int VertexIndex1() { return _vertexIndex1; }
     int VertexIndex2() { return _vertexIndex2; }
     int VertexIndex3() { return _vertexIndex3; }
-    MeshGeometry3D MeshHit() { return _meshHit; }
+    MeshGeometry3D* MeshHit() { return _meshHit; }
 
 private:
     double _height;
     double _distanceRayOrigin;
     int _vertexIndex1, _vertexIndex2, _vertexIndex3;
     Point3D _pointHit;
-    MeshGeometry3D _meshHit;
+    MeshGeometry3D* _meshHit;
 };
 
 struct SupportDataSegment
@@ -231,6 +236,31 @@ struct SupportData
 {
     QMap<QPointF, QList<RayHitResult>> map;
     QList<QList<SupportDataSegment>> supportDataSegments;
+};
+
+class RotateTransform3D : Transform3D
+{
+
+public:
+    Matrix3D Value;
+    RotateTransform3D(AxisAngleRotation3D q, Point3D p)
+    {
+
+    }
+};
+
+class Rotation3D
+{
+
+};
+
+class AxisAngleRotation3D : Rotation3D
+{
+public:
+    AxisAngleRotation3D(Vector3D axis, double length)
+    {
+
+    }
 };
 
 

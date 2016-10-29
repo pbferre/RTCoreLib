@@ -7,9 +7,9 @@
 #include "vector3d.h"
 #include "rect3d.h"
 
-using namespace CreateCore;
+//using namespace CreateCore;
 
-namespace FullSpectrumEngineering
+namespace CreateCore
 {
 class MeshGeometry3D;
 
@@ -118,9 +118,9 @@ public:
     void Subdivide4();
     void SubdivideBarycentric();
 
-    MeshGeometry3D ToSmoothShadedMesh(bool freeze = false);
-    MeshGeometry3D ToMesh(bool freeze = false);
-    static MeshGeometry3D GetUnitSphere(int subdivisions);
+    MeshGeometry3D* ToSmoothShadedMesh(bool freeze = false);
+    MeshGeometry3D* ToMesh(bool freeze = false);
+    static MeshGeometry3D* GetUnitSphere(int subdivisions);
 
     Vector3D FindCornerNormal(Point3D p, double eps);
 

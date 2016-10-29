@@ -36,7 +36,7 @@ struct Cylinder
     {
         _x = 0;
         _y = 0;
-        _z = 0;
+        _r = 0;
         _zBot = 0;
         _zTop = 0;
     }

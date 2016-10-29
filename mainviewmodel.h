@@ -10,11 +10,11 @@ namespace CreateCore
 
 enum SupportOperationType
 {
-    ElevateNoBase = 0,
-    SingleBaseWithSupports,
-    SingleBaseNoSupports,
-    BasePerSupport,
-    None
+    sotElevateNoBase = 0,
+    sotSingleBaseWithSupports,
+    sotSingleBaseNoSupports,
+    sotBasePerSupport,
+    sotNone
 };
 
 class MainViewModel

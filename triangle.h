@@ -5,7 +5,7 @@
 #include "point3d.h"
 #include "vector3d.h"
 
-using namespace CreateCore;
+//using namespace CreateCore;
 
 namespace CreateCore
 {

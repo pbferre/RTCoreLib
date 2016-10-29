@@ -4,8 +4,8 @@
 #include "rect3d.h"
 #include "point3d.h"
 #include "vector3d.h"
-#include "mainviewmodel.h"
 #include "support.h"
+#include "modelentity.h"
 
 namespace CreateCore
 {
@@ -35,19 +35,34 @@ private:
      QList<QList<QList<Point3D>>> supportSlicePoints;
      Point3D mouse;
 
+     static double IntersectionSafetyDistance = 0.4;
+
      double baseSupportHeight;
      double layerThickness;
      double offsetX, offsetY;
      int supportXLim, supportYLim;
      double supportXSpacing, supportYSpacing;
+     double supportCylRad;
+     double touchPointDiameter;
+     double touchPointLength;
+     double coneSupportLength;
+     double supportConeRad;
+     int circularThetaDiv;
 
+     static void BuildSupport(QList<Point3D> path, QList<double> diameters, QList<QPointF> section, MeshBuilder meshBuilder);
 
      void DoHitTest(Visual3D* hitModel, QList<QPointF> list, double Z);
      void ImportParams(MVMParameters p);
      void BuildBeams(SupportData data, Point3D projectedMouse = Point3D(), bool forceBuild = false);
+     void ConstructCorner(Point3D hitOrigin, Vector3D hitNormal, Point3D &displacedCylinderLimit,
+                          QList<Point3D> &path, QList<double> &diameters, Vector3D zPlane);
+     bool TestSupportModelIntersection(QList<Point3D> origSupportPath, QList<double> origDiameters, ModelEntity modelEntity);
 
-     MeshGeometry3D* GetSingleSupport(QPointF center, RayHitResult meshHit, Cylinder &cyl,
-                                     Visual3D hitModel, RayHitResult meshHitB, bool forceBuild = false);
+     MeshGeometry3D* GetSingleSupport(QPointF center, RayHitResult* meshHit, Cylinder &cyl,
+                                     Visual3D hitModel, RayHitResult* meshHitB, bool forceBuild = false);
+
+     Vector3D GetNegatedNormal(RayHitResult* hit);
+
 };
 
 }

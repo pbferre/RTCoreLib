@@ -1348,7 +1348,7 @@ void MeshBuilder::SubdivideLinear(bool barycentric)
     }
 }
 
-MeshGeometry3D MeshBuilder::ToSmoothShadedMesh(bool freeze)
+MeshGeometry3D* MeshBuilder::ToSmoothShadedMesh(bool freeze)
 {
     //if (!normals.isNull() && positions.count() != normals->count())
     if (normals && positions.count() != normals->count())
@@ -1422,16 +1422,16 @@ MeshGeometry3D MeshBuilder::ToSmoothShadedMesh(bool freeze)
         normals = &vecs;
     }
 
-    MeshGeometry3D mg;
-    mg.Positions = positions;
-    mg.TriangleIndices = triangleIndices;
-    mg.Normals = *normals;
-    mg.TextureCoordinates = *textureCoordinates;
+    MeshGeometry3D* mg = new MeshGeometry3D();
+    mg->Positions = positions;
+    mg->TriangleIndices = triangleIndices;
+    mg->Normals = *normals;
+    mg->TextureCoordinates = *textureCoordinates;
 
     return mg;
 }
 
-MeshGeometry3D MeshBuilder::ToMesh(bool freeze)
+MeshGeometry3D* MeshBuilder::ToMesh(bool freeze)
 {
     //if (!normals.isNull() && positions.count() != normals->count())
     if (normals && positions.count() != normals->count())
@@ -1445,16 +1445,16 @@ MeshGeometry3D MeshBuilder::ToMesh(bool freeze)
         throw new InvalidOperationException(WrongNumberOfTextureCoordinates);
     }
 
-    MeshGeometry3D mg;
-    mg.Positions = positions;
-    mg.TriangleIndices = triangleIndices;
-    mg.Normals = *normals;
-    mg.TextureCoordinates = *textureCoordinates;
+    MeshGeometry3D* mg = new MeshGeometry3D();
+    mg->Positions = positions;
+    mg->TriangleIndices = triangleIndices;
+    mg->Normals = *normals;
+    mg->TextureCoordinates = *textureCoordinates;
 
     return mg;
 }
 
-MeshGeometry3D MeshBuilder::GetUnitSphere(int subdivisions)
+MeshGeometry3D* MeshBuilder::GetUnitSphere(int subdivisions)
 {
     if (UnitSphereCache.contains(subdivisions))
     {
@@ -1475,7 +1475,7 @@ MeshGeometry3D MeshBuilder::GetUnitSphere(int subdivisions)
         mb.Positions()[i] = v.ToPoint3D();
     }
 
-    MeshGeometry3D mesh = mb.ToMesh();
+    MeshGeometry3D* mesh = mb.ToMesh();
     UnitSphereCache[subdivisions] = mesh;
     return mesh;
 }

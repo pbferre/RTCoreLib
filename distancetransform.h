@@ -7,21 +7,22 @@
 #include "rect3d.h"
 #include "point3d.h"
 
-using namespace CreateCore;
+//using namespace CreateCore;
 
-namespace ModelViewer
+namespace CreateCore
 {
 
 class DistanceTransform
 {
 public:
     DistanceTransform();
-    DistanceTransform(AABBTree aabbTree, double expansionDistance,
+    DistanceTransform(AABBTree* aabbTree, double expansionDistance,
                       double gridStepSize, double maxDist, bool quickInterior = false);
 
     void SetGridSizes(double expansionDistance, double gridStepSize);
     void GenerateDistanceTransform(bool quickInterior = false);
     double Eval(double zi, double yi, double xi);
+    QList<Point3D> FindPath(Point3D start);
     QList<Point3D> FindPath(Point3D start, Point3D end, bool adjustableEndpoint = false);
     void SmoothPath(QList<Point3D> &path);
     Point3D AStar_GetFirstUnimpededPoint(double modelDistance, Point3D start);
@@ -46,7 +47,7 @@ private:
     double _gridStepSize;
     double _maxDist;
     double *** distanceTransform;
-    AABBTree _aabbTree;
+    AABBTree* _aabbTree;
 };
 
 }

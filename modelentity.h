@@ -3,6 +3,7 @@
 
 #include "supportgenerator.h"
 #include "aabbtree.h"
+#include "distancetransform.h"
 
 namespace CreateCore
 {
@@ -21,12 +22,16 @@ public:
     AABBTree* Tree() { return aabbTree; }
     void GenerateAABBTree();
 
+    DistanceTransform* DistTransform() { return distanceTransform; }
+    void GenerateDistanceTransform();
+
 private:
     ModelVisual3DObservable* supportModelVisual3D;
     ModelVisual3DObservable* modelVisual3D;
     Model3DGroup modelGroup;
 
     AABBTree* aabbTree;
+    DistanceTransform* distanceTransform;
 };
 
 }

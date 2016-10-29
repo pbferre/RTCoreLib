@@ -5,9 +5,9 @@
 #include "rect3d.h"
 #include "vector3d.h"
 
-using namespace CreateCore;
+//using namespace CreateCore;
 
-namespace ModelViewer
+namespace CreateCore
 {
 class Triangle;
 

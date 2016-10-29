@@ -19,7 +19,7 @@ DistanceTransform::DistanceTransform()
     distanceTransform = 0;
 }
 
-DistanceTransform::DistanceTransform(AABBTree aabbTree, double expansionDistance,
+DistanceTransform::DistanceTransform(AABBTree* aabbTree, double expansionDistance,
                                      double gridStepSize, double maxDist, bool quickInterior)
 {
     _aabbTree = aabbTree;
@@ -31,7 +31,7 @@ DistanceTransform::DistanceTransform(AABBTree aabbTree, double expansionDistance
 
 void DistanceTransform::SetGridSizes(double expansionDistance, double gridStepSize)
 {
-    Rect3D bb = _aabbTree.Root()->BB();
+    Rect3D bb = _aabbTree->Root()->BB();
     _startX = bb.X() - expansionDistance - gridStepSize / 2;
     _startY = bb.Y() - expansionDistance - gridStepSize / 2;
     _startZ = bb.Z() - expansionDistance - gridStepSize / 2;
@@ -76,7 +76,7 @@ void DistanceTransform::GenerateDistanceTransform(bool quickInterior)
             {
                 double x = _startX + k * _gridStepSize;
                 Point3D p(x, y, z);
-                double d = _aabbTree.Distance(p, _maxDist, lastExterior, knownSign, quickInterior);
+                double d = _aabbTree->Distance(p, _maxDist, lastExterior, knownSign, quickInterior);
                 previousD = d;
                 lastExterior = d >= 0;
                 knownSign = (fabs(d) > _gridStepSize);
@@ -127,6 +127,44 @@ double DistanceTransform::Eval(double zi, double yi, double xi)
     return interpolatedValue;
 }
 
+QList<Point3D> DistanceTransform::FindPath(Point3D start)
+{
+    World world;
+    world.SetDistance(*this);
+
+    double x1 = (start.x() - _startX) / _gridStepSize;
+    double y1 = (start.y() - _startY) / _gridStepSize;
+    double z1 = (start.z() - _startZ) / _gridStepSize;
+    double pn[3] = { z1, y1, x1 };
+
+
+    double pe[3];
+    double z2 = (2 - _startZ) / _gridStepSize;
+    pe[0] = z2;
+    pe[1] = y1;
+    pe[2] = x1;
+
+    Point3D vStart(pn[0], pn[1], pn[2]);
+    Point3D vEnd(pe[0], pe[1], pe[2]);
+
+    bool buildPlaneShortCut = false;    //(end == 0);
+    SearchNode* node = PathFinder::FindPath(world, vStart, vEnd, this, buildPlaneShortCut, adjustableEndpoint);
+
+
+    QList<Point3D> path;
+    while (node)// && node.next != null)
+    {
+        double z = _startZ + node->Position().x() * _gridStepSize;
+        double y = _startY + node->Position().y() * _gridStepSize;
+        double x = _startX + node->Position().z() * _gridStepSize;
+        Point3D a(x, y, z);
+        path.append(a);
+        node = node->Next();
+    }
+    SmoothPath(path);
+    return path;
+}
+
 QList<Point3D> DistanceTransform::FindPath(Point3D start, Point3D end, bool adjustableEndpoint)
 {
     //if(world==null)
@@ -140,24 +178,13 @@ QList<Point3D> DistanceTransform::FindPath(Point3D start, Point3D end, bool adju
 
 
     double pe[3];
-    if (end.x() != 0 || end.y() != 0 || end.z() != 0)
-    {
-        Point3D e = end;
-        double x2 = (e.x() - _startX) / _gridStepSize;
-        double y2 = (e.y() - _startY) / _gridStepSize;
-        double z2 = (e.z() - _startZ) / _gridStepSize;
-        pe[0] = z2;
-        pe[1] = y2;
-        pe[2] = x2;
-    }
-    else
-    {
-        double z2 = (2 - _startZ) / _gridStepSize;
-        pe[0] = z2;
-        pe[1] = y1;
-        pe[2] = x1;
-    }
-
+    Point3D e = end;
+    double x2 = (e.x() - _startX) / _gridStepSize;
+    double y2 = (e.y() - _startY) / _gridStepSize;
+    double z2 = (e.z() - _startZ) / _gridStepSize;
+    pe[0] = z2;
+    pe[1] = y2;
+    pe[2] = x2;
 
     Point3D vStart(pn[0], pn[1], pn[2]);
     Point3D vEnd(pe[0], pe[1], pe[2]);

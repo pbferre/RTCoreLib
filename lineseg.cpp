@@ -7,7 +7,7 @@
 //#include "point3d.h"
 #include "triangle.h"
 
-using namespace ModelViewer;
+//using namespace ModelViewer;
 using namespace CreateCore;
 
 const double SMALL_NUM = 0.00000001;

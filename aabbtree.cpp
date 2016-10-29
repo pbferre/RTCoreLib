@@ -7,9 +7,9 @@
 
 #include "point3d.h"
 
-using namespace ModelViewer;
+//using namespace ModelViewer;
 using namespace CreateCore;
-using namespace FullSpectrumEngineering;
+//using namespace FullSpectrumEngineering;
 
 bool AABBTree::IsInterior(QList<Triangle> ts, Point3D closestPoint, Point3D p)
 {
@@ -585,11 +585,11 @@ bool AABBTree::Intersect(AABBTree tree)
     return Intersect(_root, tree.Root());
 }
 
-void AABBTree::PopulateFromMesh(MeshGeometry3D m, Transform3D* transform)
+void AABBTree::PopulateFromMesh(MeshGeometry3D* m, Transform3D* transform)
 {
     QList<Triangle> triangles;
-    QList<Point3D> pos = m.Positions;
-    QList<int> tri = m.TriangleIndices;
+    QList<Point3D> pos = m->Positions;
+    QList<int> tri = m->TriangleIndices;
 
     for (int i = 0; i < pos.count(); i++)
         tri.append(i);
@@ -624,13 +624,10 @@ void AABBTree::PopulateFromMesh(MeshGeometry3D m, Transform3D* transform)
     BuildTreeRecurse(triangles, _root);
 }
 
-void AABBTree::PopulateFromModel(Model3DGroup model, Transform3D transform)
+void AABBTree::PopulateFromModel(Model3DGroup* model, Transform3D* transform)
 {
-    Model3D m = model.Children.at(0);
-    Model3D* mptr = &m;
-    GeometryModel3D*gmptr = dynamic_cast<GeometryModel3D*>(mptr);
-    GeometryModel3D gm = *gmptr;
-    MeshGeometry3D mesh = gm.Geometry;
-    Transform3D* t = &transform;
-    PopulateFromMesh(mesh, t);
+    Model3D* mptr = model->Children.at(0);
+    GeometryModel3D* gmptr = dynamic_cast<GeometryModel3D*>(mptr);
+    MeshGeometry3D* mesh = gmptr->Geometry;
+    PopulateFromMesh(mesh, transform);
 }

@@ -5,7 +5,7 @@
 #include <functional>
 
 using namespace CreateCore;
-using namespace ModelViewer;
+//using namespace ModelViewer;
 
 static const double EPS = 1e-6;
 static const long multiplier = 1000000;

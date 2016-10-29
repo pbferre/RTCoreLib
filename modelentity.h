@@ -1,7 +1,7 @@
 #ifndef MODELENTITY_H
 #define MODELENTITY_H
 
-#include "supportgenerator.h"
+//#include "supportgenerator.h"
 #include "aabbtree.h"
 #include "distancetransform.h"
 
@@ -24,6 +24,8 @@ public:
 
     DistanceTransform* DistTransform() { return distanceTransform; }
     void GenerateDistanceTransform();
+
+    int PositionsHash;
 
 private:
     ModelVisual3DObservable* supportModelVisual3D;

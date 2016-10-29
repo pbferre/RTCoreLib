@@ -5,7 +5,8 @@
 #include "point3d.h"
 #include "vector3d.h"
 #include "support.h"
-#include "modelentity.h"
+//#include "modelentity.h"
+#include "mainviewmodel.h"
 
 namespace CreateCore
 {
@@ -15,7 +16,7 @@ class SupportGenerator
 public:
     SupportGenerator();
     SupportGenerator(MVMParameters params, QList<Point3D> list, Rect3D rect, TransformState state,
-                     SupportOperationType sot = SingleBaseWithSupports);
+                     SupportOperationType sot = sotSingleBaseWithSupports);
 
     void SingleSupportRay(ModelVisual3DObservable hitModel, Point3D mouse);
 

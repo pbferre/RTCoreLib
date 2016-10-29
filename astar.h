@@ -7,7 +7,7 @@
 #include "distancetransform.h"
 
 using namespace CreateCore;
-using namespace ModelViewer;
+//using namespace ModelViewer;
 
 namespace Tests
 {

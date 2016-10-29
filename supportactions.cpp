@@ -55,10 +55,10 @@ void SupportActions::AddManualPoints(float *vec3Array, int length)
     qDebug() << "AddManualPoints";
     double thickness = MVM->Parameters().LayerThickness();
     MVM->setNumSlices((int)ceil((SceneRect.SizeZ()) / thickness) - (int)floor(SceneRect.Z() / thickness) + 1);
-    MainViewModel.CylinderPaths.clear();
-    MainViewModel.CylinderDiams.clear();
+    MainViewModel::CylinderPaths.clear();
+    MainViewModel::CylinderDiams.clear();
 
-    SliceMesh mesh = meshList.at(0);
+    SliceMesh* mesh = meshList.at(0);
 
     SupportEntityPrep sep(mesh.positions, mesh.bounds, mesh.transformM44);
 

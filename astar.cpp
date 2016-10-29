@@ -3,7 +3,7 @@
 #include "astar.h"
 
 using namespace Tests;
-using namespace ModelViewer;
+//using namespace ModelViewer;
 
 Point3D PathFinder::AStar_LastUnimpededZVoxel = Point3D();
 QList<Surr> PathFinder::Surrounding = PathFinder::InitializeSurrounding();

@@ -14,7 +14,7 @@ public:
     void setBaseSupportHeight(float value) { baseSupportHeight = value; }
 
     bool TreeSupports() { return treeSupports; }
-    void setTreeSupports() { treeSupports = value; }
+    void setTreeSupports(bool value) { treeSupports = value; }
 
     double ShellingThickness() { return shellingThickness; }
     void setShellingThickness(double value) { shellingThickness = value; }
@@ -23,7 +23,7 @@ public:
     void setShellingGridStepSize(double value) { shellingGridStepSize = value; }
 
     double ShellingInteriorSupportSpacing() { return shellingInteriorSupportSpacing; }
-    void setShellingInteriorSupportSpacing(douoble value) { shellingInteriorSupportSpacing; = value; }
+    void setShellingInteriorSupportSpacing(double value) { shellingInteriorSupportSpacing = value; }
 
     double ShellingInteriorSupportWidth() { return shellingInteriorSupportWidth; }
     void setShellingInteriorSupportWidth(double value) { shellingInteriorSupportWidth = value; }

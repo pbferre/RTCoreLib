@@ -23,6 +23,11 @@ struct Cylinder
     double _zBot;
     double _zTop;
 
+    Cylinder()
+    {
+        Clear();
+    }
+
     Cylinder(double x, double y, double r, double zBot, double zTop)
     {
         _x = x;

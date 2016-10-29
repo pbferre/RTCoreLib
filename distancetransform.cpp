@@ -5,7 +5,7 @@
 #include <limits>
 
 using namespace CreateCore;
-using namespace ModelViewer;
+//using namespace ModelViewer;
 using namespace Tests;
 
 namespace ublas = boost::numeric::ublas;
@@ -148,7 +148,7 @@ QList<Point3D> DistanceTransform::FindPath(Point3D start)
     Point3D vEnd(pe[0], pe[1], pe[2]);
 
     bool buildPlaneShortCut = false;    //(end == 0);
-    SearchNode* node = PathFinder::FindPath(world, vStart, vEnd, this, buildPlaneShortCut, adjustableEndpoint);
+    SearchNode* node = PathFinder::FindPath(world, vStart, vEnd, this, buildPlaneShortCut, false);
 
 
     QList<Point3D> path;

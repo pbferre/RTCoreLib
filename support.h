@@ -10,6 +10,7 @@
 #include "point3d.h"
 #include "vector3d.h"
 #include "rect3d.h"
+#include "matrix3d.h"
 #include "cylindercollision.h"
 
 //using namespace CreateCore;
@@ -238,17 +239,6 @@ struct SupportData
     QList<QList<SupportDataSegment>> supportDataSegments;
 };
 
-class RotateTransform3D : Transform3D
-{
-
-public:
-    Matrix3D Value;
-    RotateTransform3D(AxisAngleRotation3D q, Point3D p)
-    {
-
-    }
-};
-
 class Rotation3D
 {
 
@@ -263,6 +253,17 @@ public:
     }
 };
 
+
+class RotateTransform3D : Transform3D
+{
+
+public:
+    Matrix3D Value;
+    RotateTransform3D(AxisAngleRotation3D q, Point3D p)
+    {
+
+    }
+};
 
 /* Matrix inversion routine.
     Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */

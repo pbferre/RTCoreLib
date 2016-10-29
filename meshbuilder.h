@@ -107,7 +107,7 @@ public:
     void AddRectangularMeshTriangleIndices(int index0, int rows, int columns, bool rowsClosed, bool columnsClosed);
 
     void Append(MeshBuilder mesh);
-    void Append(MeshGeometry3D mesh);
+    void Append(MeshGeometry3D* mesh);
     void Append(QList<Point3D> positionsToAppend, QList<int> triangleIndicesToAppend,
                 QList<Vector3D> normalsToAppend, QList<QPointF> textureCoordinatesToAppend);
     void AppendTo(MeshGeometry3D target, MeshGeometry3D addition);
@@ -127,7 +127,7 @@ public:
 
 private:
     static QMap<int, QList<QPointF>> CircleCache;
-    static QMap<int, MeshGeometry3D> UnitSphereCache;
+    static QMap<int, MeshGeometry3D*> UnitSphereCache;
 //    QPointer<QList<Vector3D>> normals;
 //    QPointer<QList<QPointF>> textureCoordinates;
     QList<Vector3D> *normals;

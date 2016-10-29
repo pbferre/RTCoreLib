@@ -10,7 +10,7 @@ using namespace CreateCore;
 
 QList<QPointF> MeshBuilder::Circle = QList<QPointF>();
 QMap<int, QList<QPointF> > MeshBuilder::CircleCache = QMap<int, QList<QPointF>>();
-QMap<int, MeshGeometry3D> MeshBuilder::UnitSphereCache = QMap<int, MeshGeometry3D>();
+QMap<int, MeshGeometry3D*> MeshBuilder::UnitSphereCache = QMap<int, MeshGeometry3D*>();
 
 MeshBuilder::MeshBuilder()
 {
@@ -1188,9 +1188,9 @@ void MeshBuilder::Append(MeshBuilder mesh)
     Append(mesh.Positions(), mesh.TriangleIndices(), *mesh.Normals(), *mesh.TextureCoordinates());
 }
 
-void MeshBuilder::Append(MeshGeometry3D mesh)
+void MeshBuilder::Append(MeshGeometry3D* mesh)
 {
-    Append(mesh.Positions, mesh.TriangleIndices, mesh.Normals, mesh.TextureCoordinates);     // mesh.Normals, mesh.TextureCoordinates);
+    Append(mesh->Positions, mesh->TriangleIndices, mesh->Normals, mesh->TextureCoordinates);     // mesh.Normals, mesh.TextureCoordinates);
 }
 
 void MeshBuilder::Append(QList<Point3D> positionsToAppend, QList<int> triangleIndicesToAppend,

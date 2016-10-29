@@ -130,8 +130,8 @@ public:
     Point3D ClosestPoint(Point3D p, double maxDist = DBL_MAX);
     bool IsInterior(Point3D p);
     double Distance(Point3D p, double maxDist = DBL_MAX, bool assumePositive = true, bool knownSign = false, bool quickInterior = false);
-    void PopulateFromMesh(MeshGeometry3D m, Transform3D* transform);
-    void PopulateFromModel(Model3DGroup model, Transform3D transform);
+    void PopulateFromMesh(MeshGeometry3D* m, Transform3D* transform);
+    void PopulateFromModel(Model3DGroup* model, Transform3D* transform);
 
 private:
     AABBNode* _root;

@@ -1,6 +1,8 @@
 #ifndef SUPPORTGENERATOR_H
 #define SUPPORTGENERATOR_H
 
+#include <tuple>
+
 #include "rect3d.h"
 #include "point3d.h"
 #include "vector3d.h"
@@ -28,7 +30,8 @@ public:
 
 private:
      QList<QPointF> hitList;
-     QMap<QPointF, QList<RayHitResult*>> hitMap;
+     //QHash<QPointF, QList<RayHitResult*>> hitMap;
+     QList<std::tuple<QPointF, QList<RayHitResult*>>> hitMap;
 
      ModelVisual3DObservable* hitModel;
      SupportOperationType supportOperationType;

@@ -245,7 +245,7 @@ struct SupportDataSegment
 
 struct SupportData
 {
-    QMap<QPointF, QList<RayHitResult*>> map;
+    QList<std::tuple<QPointF, QList<RayHitResult*>>> map;
     QList<QList<SupportDataSegment>> supportDataSegments;
 };
 

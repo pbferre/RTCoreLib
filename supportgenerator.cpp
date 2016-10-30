@@ -91,9 +91,22 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
         RayHitResult* rhr = new RayHitResult(Z);
         rhrList.append(rhr);
 
-        if (!hitMap.contains(point))
+        bool contains = false;
+        for (int i = 0; i < hitMap.count(); i++)
         {
-            hitMap.insert(point, rhrList);
+            std::tuple<QPointF, QList<RayHitResult*>> t = hitMap.at(i);
+            QPointF pt = std::get<0>(t);
+            if (point == pt)
+            {
+                contains = true;
+                break;
+            }
+        }
+
+        if (!contains)
+        {
+            auto t = std::make_tuple(point, rhrList);
+            hitMap.append(t);
         }
     }
 
@@ -109,7 +122,18 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
         if (intersects)
         {
             MeshGeometry3D* mesh = dynamic_cast<MeshGeometry3D*>(m->ModelGroup()->Children.at(0));
-            QList<RayHitResult*> results = hitMap.value(p);
+            QList<RayHitResult*> results;
+            for (int i = 0; i < hitMap.count(); i++)
+            {
+                std::tuple<QPointF, QList<RayHitResult*>> t = hitMap.at(i);
+                QPointF pt = std::get<0>(t);
+                if (p == pt)
+                {
+                    results = std::get<1>(t);
+                    break;
+                }
+            }
+
             for (int i = 0; i < trianglesOfIntersection.count(); i++)
             {
                 Triangle t = trianglesOfIntersection.at(i);
@@ -141,11 +165,14 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
         }
     }
 
-    foreach(QPointF p, hitMap.keys())
+    for (int i = 0; i < hitMap.count(); i++)
     {
-        QList<RayHitResult*> list = hitMap.value(p);
-        if (list.isEmpty())
-            hitMap.remove(p);
+        std::tuple<QPointF, QList<RayHitResult*>> t = hitMap.at(i);
+        QList<RayHitResult*> rhrList = std::get<1>(t);
+        if (rhrList.isEmpty())
+        {
+            hitMap.removeAt(i);
+        }
     }
 }
 
@@ -177,14 +204,27 @@ void SupportGenerator::BuildBeams(SupportData data, Point3D projectedMouse, bool
         {
             SupportDataSegment segment = group.at(j);
             QPointF key(segment.point.x(), segment.point.y());
+            QList<RayHitResult*> meshHits;
 
-            if (!data.map.contains(key))
+            bool contains = false;
+            for (int i = 0; i < hitMap.count(); i++)
+            {
+                std::tuple<QPointF, QList<RayHitResult*>> t = hitMap.at(i);
+                QPointF pt = std::get<0>(t);
+                if (pt == key)
+                {
+                    meshHits = std::get<1>(t);
+                    contains = true;
+                    break;
+                }
+            }
+
+            if (!contains)
             {
                 qDebug() << "Problem retrieving results for point at X:" << key.x() << " Y:" << key.y();
                 continue;
             }
 
-            QList<RayHitResult*> meshHits = data.map.value(key);
             int floor = 0;
             int ceiling = meshHits.count();
 

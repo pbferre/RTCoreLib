@@ -3,6 +3,10 @@
 
 using namespace CreateCore;
 
+QList<QList<Point3D>> MainViewModel::CylinderPaths = QList<QList<Point3D>>();
+QList<QList<double>> MainViewModel::CylinderDiams = QList<QList<double>>();
+QList<ModelEntity*> MainViewModel::listModelEntities = QList<ModelEntity*>();
+
 bool littleEndian()
 {
     short int word = 0x0001;

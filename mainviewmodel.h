@@ -40,7 +40,7 @@ private:
     long doubleToInt64Bits(double val);
 };
 
-MainViewModel *MVM;
+static MainViewModel *MVM;
 
 }
 

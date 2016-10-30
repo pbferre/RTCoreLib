@@ -86,12 +86,9 @@ public:
     {
         return new Transform3D();
     }
-};
 
-bool operator ==(Transform3D t1, Transform3D t2)
-{
-    return (t1.OffsetX == t2.OffsetX) && (t1.OffsetY == t2.OffsetY);
-}
+    bool operator ==(Transform3D &t);
+};
 
 class Transform3DGroup : public Transform3D
 {
@@ -102,23 +99,17 @@ public:
     {
 
     }
-};
 
-bool operator ==(Transform3DGroup t1, Transform3DGroup t2)
-{
-    return t1.Children == t2.Children;
-}
+    bool operator ==(Transform3DGroup &tg);
+};
 
 class Visual3D
 {
 public:
     Transform3DGroup Transform;
-};
 
-bool operator ==(Visual3D v1, Visual3D v2)
-{
-    return v1.Transform == v2.Transform;
-}
+    bool operator ==(Visual3D & v);
+};
 
 class Model3D
 {
@@ -294,6 +285,10 @@ public:
     lu_substitute(A, pm, inverse);
     return true;
  }
+
+ //bool operator ==(Transform3D t1, Transform3D t2);
+ //bool operator ==(Transform3DGroup t1, Transform3DGroup t2);
+ //bool operator ==(Visual3D v1, Visual3D v2);
 
 }
 

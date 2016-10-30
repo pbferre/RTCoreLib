@@ -37,7 +37,8 @@ SOURCES += rtcorelib.cpp \
     mainviewmodel.cpp \
     mvmparameters.cpp \
     supportgenerator.cpp \
-    modelentity.cpp
+    modelentity.cpp \
+    support.cpp
 
 HEADERS += rtcorelib.h\
         rtcorelib_global.h \

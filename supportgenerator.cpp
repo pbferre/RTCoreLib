@@ -15,6 +15,8 @@
 using namespace CreateCore;
 
 double SupportGenerator::IntersectionSafetyDistance = 0.4;
+int SupportGenerator::Top = 0;
+int SupportGenerator::Bottom = 0;
 
 SupportGenerator::SupportGenerator()
 {

@@ -21,11 +21,12 @@ void ModelEntity::GenerateAABBTree()
 
 void ModelEntity::GenerateDistanceTransform()
 {
-    double expansionDistance = MVM->Parameters().ShellingThickness();     //MainViewModel .Instance.ShellingThickness;
-    double gridStepSize = MVM->Parameters().ShellingGridStepSize();      //MainViewModel.Instance.ShellingGridStepSize;
-    double supportSpacing = MVM->Parameters().ShellingInteriorSupportSpacing();        //MainViewModel.Instance.ShellingInteriorSupportSpacing;
-    double supportWidth = MVM->Parameters().ShellingInteriorSupportWidth();      //MainViewModel.Instance.ShellingInteriorSupportWidth;
-    int subsampling = MVM->Parameters().ShellingSubSampling();      //(int)MainViewModel.Instance.ShellingSubsampling;
+    MainViewModel* mvm = MainViewModel::MVM;
+    double expansionDistance = mvm->Parameters().ShellingThickness();     //MainViewModel .Instance.ShellingThickness;
+    double gridStepSize = mvm->Parameters().ShellingGridStepSize();      //MainViewModel.Instance.ShellingGridStepSize;
+    double supportSpacing = mvm->Parameters().ShellingInteriorSupportSpacing();        //MainViewModel.Instance.ShellingInteriorSupportSpacing;
+    double supportWidth = mvm->Parameters().ShellingInteriorSupportWidth();      //MainViewModel.Instance.ShellingInteriorSupportWidth;
+    int subsampling = mvm->Parameters().ShellingSubSampling();      //(int)MainViewModel.Instance.ShellingSubsampling;
     double maxDist = expansionDistance + gridStepSize;
     distanceTransform = new DistanceTransform(aabbTree, expansionDistance, gridStepSize, maxDist, false);
 }

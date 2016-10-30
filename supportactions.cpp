@@ -1,5 +1,5 @@
 #include "supportactions.h"
-#include "mainviewmodel.h"
+//#include "mainviewmodel.h"
 
 #include <QDebug>
 #include <QtCore>
@@ -8,12 +8,14 @@
 
 using namespace CreateCore;
 
-Rect3D SupportActions::SceneRect = Rect3D();
-QList<SliceMesh*> SupportActions::meshList = QList<SliceMesh*>();
+//Rect3D SupportActions::SceneRect = Rect3D();
+//QList<SliceMesh*> SupportActions::meshList = QList<SliceMesh*>();
 
 SupportActions::SupportActions()
 {
-
+    MVM = MainViewModel::MVM;
+    slicesCompleted = 0;
+    points = 0;
 }
 
 void SupportActions::AddMesh(float *vec3Array, int size, float height, int entityID, float *transform)
@@ -52,15 +54,16 @@ void SupportActions::AddMesh(float *vec3Array, int size, float height, int entit
 
 void SupportActions::AddManualPoints(float *vec3Array, int length)
 {
+    MainViewModel* mvm = MainViewModel::MVM;
     qDebug() << "AddManualPoints";
-    double thickness = MVM->Parameters().LayerThickness();
-    MVM->setNumSlices((int)ceil((SceneRect.SizeZ()) / thickness) - (int)floor(SceneRect.Z() / thickness) + 1);
+    double thickness = mvm->Parameters().LayerThickness();  //MVM->Parameters().LayerThickness();
+    mvm->setNumSlices((int)ceil((SceneRect.SizeZ()) / thickness) - (int)floor(SceneRect.Z() / thickness) + 1);
     MainViewModel::CylinderPaths.clear();
     MainViewModel::CylinderDiams.clear();
 
     SliceMesh* mesh = meshList.at(0);
 
-    MVM->SupportEntityPrep(mesh->positions, mesh->bounds, mesh->transformM44);
+    mvm->SupportEntityPrep(mesh->positions, mesh->bounds, mesh->transformM44);
 
     QList<Point3D> m;
     for (int num = 0; num < length; num += 3)
@@ -72,8 +75,8 @@ void SupportActions::AddManualPoints(float *vec3Array, int length)
     QElapsedTimer et;
     et.start();
 
-    MVM->GetSingleSupport(m[0]);
+    mvm->GetSingleSupport(m[0]);
 
     qDebug() << "Single Support total ms within mono: " + et.elapsed();
-    length = MVM->CylinderPaths.count();
+    length = mvm->CylinderPaths.count();
 }

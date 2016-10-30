@@ -6,6 +6,7 @@ using namespace CreateCore;
 QList<QList<Point3D>> MainViewModel::CylinderPaths = QList<QList<Point3D>>();
 QList<QList<double>> MainViewModel::CylinderDiams = QList<QList<double>>();
 QList<ModelEntity*> MainViewModel::listModelEntities = QList<ModelEntity*>();
+MainViewModel* MainViewModel::MVM = 0;
 
 bool littleEndian()
 {
@@ -16,7 +17,8 @@ bool littleEndian()
 
 MainViewModel::MainViewModel()
 {
-    MVM = this;;
+    if (!MVM)
+        MVM = this;;
 }
 
 long MainViewModel::doubleToInt64Bits(double val)

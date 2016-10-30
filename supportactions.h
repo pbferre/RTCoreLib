@@ -3,6 +3,7 @@
 
 #include "point3d.h"
 #include "rect3d.h"
+#include "mainviewmodel.h"
 
 namespace CreateCore
 {
@@ -39,12 +40,17 @@ class SupportActions
 public:
     SupportActions();
 
-    static Rect3D SceneRect;
-    static int points;
-    static QList<SliceMesh*> meshList;
+    Rect3D SceneRect;
+    QList<SliceMesh*> meshList;
 
-    static void AddMesh(float* vec3Array, int size, float height, int entityID, float* transform);
-    static void AddManualPoints(float* vec3Array, int length);
+    void AddMesh(float* vec3Array, int size, float height, int entityID, float* transform);
+    void AddManualPoints(float* vec3Array, int length);
+
+    MainViewModel* MVM;
+
+private:
+    int slicesCompleted;
+    int points;
 };
 
 }

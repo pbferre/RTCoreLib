@@ -69,7 +69,7 @@ void SupportGenerator::ImportParams(MVMParameters p)
 void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double Z)
 {
     ModelEntity* m = 0;
-    foreach (ModelEntity* me, MVM->listModelEntities)
+    foreach (ModelEntity* me, MainViewModel::MVM->listModelEntities)
     {
         if (me->SupportModelVisual3D() == hitModel || m->ModelVisual3D() == hitModel)
         {
@@ -343,7 +343,7 @@ void SupportGenerator::BuildBeams(SupportData data, Point3D projectedMouse, bool
 
 ModelEntity* SupportGenerator::GetModelEntityFromHitModel(Visual3D* hitModel)
 {
-    foreach(ModelEntity* me, MVM->listModelEntities)
+    foreach(ModelEntity* me, MainViewModel::MVM->listModelEntities)
     {
         if (me->SupportModelVisual3D() == hitModel || me->ModelVisual3D() == hitModel)
         {
@@ -379,13 +379,14 @@ Vector3D SupportGenerator::GetNegatedNormal(RayHitResult *hit)
 MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult* meshHit, Cylinder &cylinder,
                                                    Visual3D* hitModel, RayHitResult* meshHitB, bool forceBuild)
 {
+    MainViewModel* mvm = MainViewModel::MVM;
     cylinder.Clear();
 
     ModelEntity* me = GetModelEntityFromHitModel(hitModel);
     if (!me)
         return 0;
 
-    if (!MVM->Parameters().TreeSupports())
+    if (!mvm->Parameters().TreeSupports())
         return 0;
 
     Point3D displacedCylBottom;
@@ -416,7 +417,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
         diameters_T[1] = X;
         diameters_T[0] = X + (A - X) / l1 * l2;
 
-        displacedCylBottom = Point3D (path_T.last().x(), path_T.last().y(), MVM->Parameters().BaseSupportHeight());
+        displacedCylBottom = Point3D (path_T.last().x(), path_T.last().y(), mvm->Parameters().BaseSupportHeight());
         if (supportOperationType == sotBasePerSupport || supportOperationType == sotNone || supportOperationType == sotElevateNoBase)
         {
             if (path_T.last() != displacedCylBottom)
@@ -441,7 +442,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
     {
         Point3D displacedCylTop;
 
-        double bottomHit = MVM->Parameters().BaseSupportHeight();
+        double bottomHit = mvm->Parameters().BaseSupportHeight();
 
         if (meshHitB && meshHitB->MeshHit())
         {
@@ -526,7 +527,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
         cylinder = cyl;
 
         // Add bottom cone for auto generation (mesh-mesh internal supports)
-        if (bottomHit != MVM->Parameters().BaseSupportHeight() && meshHitB && meshHitB->MeshHit())
+        if (bottomHit != mvm->Parameters().BaseSupportHeight() && meshHitB && meshHitB->MeshHit())
         {
             for (int i = path_B.count(); i > 0; i--)
             {
@@ -581,8 +582,8 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
             //Debugger.Break();
         }
 
-        MVM->CylinderPaths.append(path_T);
-        MVM->CylinderDiams.append(diameters_T);
+        mvm->CylinderPaths.append(path_T);
+        mvm->CylinderDiams.append(diameters_T);
 
         MeshBuilder* meshBuilder = new MeshBuilder (true, true);
         BuildSupport (path_T, diameters_T, MeshBuilder::GetCircle(circularThetaDiv), meshBuilder);

@@ -30,6 +30,8 @@ public:
 
     void GetSingleSupport(Point3D mouse);
 
+    static MainViewModel *MVM;
+
 private:
     MVMParameters parameters;
     ModelEntity* currentEntity;
@@ -39,8 +41,6 @@ private:
     long GetPositionsHash(QList<Point3D> positions);
     long doubleToInt64Bits(double val);
 };
-
-static MainViewModel *MVM;
 
 }
 

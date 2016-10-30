@@ -1,6 +1,8 @@
 #ifndef MVMPARAMETERS_H
 #define MVMPARAMETERS_H
 
+namespace CreateCore
+{
 
 class MVMParameters
 {
@@ -65,4 +67,5 @@ private:
     bool treeSupports;
 };
 
+}
 #endif // MVMPARAMETERS_H

@@ -43,6 +43,9 @@ public:
     float TouchPointDiameter() { return touchPointDiameter; }
     void setTouchPointDiameter(float value) { touchPointDiameter = value; }
 
+    int CornerDivisions() { return cornerDivisions; }
+    void setCornerDivisions(int value) { cornerDivisions = value; }
+
 private:
     float layerThickness;
     float baseSupportHeight;
@@ -57,6 +60,7 @@ private:
 
     double supportSpace;
     int thetaDiv;
+    int cornerDivisions;
 
     bool treeSupports;
 };

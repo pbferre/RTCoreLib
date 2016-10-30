@@ -1,13 +1,13 @@
 #ifndef MODELENTITY_H
 #define MODELENTITY_H
 
-//#include "supportgenerator.h"
+#include "supportgenerator.h"
 #include "aabbtree.h"
 #include "distancetransform.h"
 #include "support.h"
 #include "mvmparameters.h"
 
-class SupportGenerator;
+//class SupportGenerator;
 
 namespace CreateCore
 {

@@ -51,7 +51,7 @@ public:
     bool CreateTextureCoordinates();
     void CreateTextureCoordinates(bool value);
 
-    static QList<QPointF> GetCirle(int thetaDiv);
+    static QList<QPointF> GetCircle(int thetaDiv);
     static QList<QPointF> Circle;
 
     void AddArrow(Point3D point1, Point3D point2, double diameter, double headLength = 10, int thetaDiv = 18);

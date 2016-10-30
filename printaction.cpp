@@ -11,7 +11,8 @@ PrintAction::PrintAction(QObject *parent) : QObject(parent)
     bytesToSend.clear();
 
     bool b = connectResponseSocket.bind(QHostAddress::LocalHost, 25);
-    connect(&connectResponseSocket, SIGNAL(readyRead()), this, SLOT(getConnectionResponse()));
+    if (b)
+        connect(&connectResponseSocket, SIGNAL(readyRead()), this, SLOT(getConnectionResponse()));
 }
 
 void PrintAction::sendConnectRequest()

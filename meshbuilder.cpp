@@ -71,7 +71,7 @@ void MeshBuilder::CreateTextureCoordinates(bool value)
         textureCoordinates->clear();
 }
 
-QList<QPointF> MeshBuilder::GetCirle(int thetaDiv)
+QList<QPointF> MeshBuilder::GetCircle(int thetaDiv)
 {
     QList<QPointF> circle;
     if(CircleCache.contains(thetaDiv))
@@ -1109,7 +1109,7 @@ void MeshBuilder::AddTriangles(QList<Point3D> trianglePositions, QList<Vector3D>
 
 void MeshBuilder::AddTube(QList<Point3D> path, QList<double> values, QList<double> diameters, int thetaDiv, bool isTubeClosed)
 {
-    QList<QPointF> circle = GetCirle(thetaDiv);
+    QList<QPointF> circle = GetCircle(thetaDiv);
     AddTube(path, values, diameters, circle, isTubeClosed, true);
 }
 

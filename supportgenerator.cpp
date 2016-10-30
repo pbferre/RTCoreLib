@@ -5,7 +5,7 @@
 #include "aabbtree.h"
 #include "rcexceptions.h"
 #include "mainviewmodel.h"
-//#include "modelentity.h"
+#include "modelentity.h"
 
 #include <cmath>
 #include <limits>
@@ -56,6 +56,12 @@ void SupportGenerator::ImportParams(MVMParameters p)
     circularThetaDiv = p.ThetaDiv();
     touchPointDiameter = p.TouchPointDiameter();
     touchPointLength = touchPointDiameter / 2;
+    if (touchPointDiameter > 2 * supportCylRad)
+        touchPointWithdrawal = -coneSupportLength;
+    else
+        touchPointWithdrawal = -coneSupportLength * touchPointDiameter / (2 * supportCylRad);
+
+    cornerComplexity = p.CornerDivisions();
 }
 
 void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double Z)
@@ -63,7 +69,7 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
     ModelEntity* m = 0;
     foreach (ModelEntity* me, MVM->listModelEntities)
     {
-        if (m->supportModelVisual3D == hitModel || m->modelVisual3D == hitModel)
+        if (me->SupportModelVisual3D() == hitModel || m->ModelVisual3D() == hitModel)
         {
             m = me;
             break;
@@ -79,10 +85,10 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
     }
 
     hitMap.clear();
-    foreach(QPointF p, list)
+    foreach(QPointF point, list)
     {
-        QList<RayHitResult> rhrList;
-        RayHitResult rhr(Z);
+        QList<RayHitResult*> rhrList;
+        RayHitResult* rhr = new RayHitResult(Z);
         rhrList.append(rhr);
 
         if (!hitMap.contains(point))
@@ -102,13 +108,15 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
         bool intersects = m->Tree()->Intersect(LineSeg(a, b), trianglesOfIntersection, pointsOfIntersection);
         if (intersects)
         {
-            MeshGeometry3D mesh = (MeshGeometry3D)m->modelGroup.Children.at(0);
-            QList<RayHitResult> results = hitMap.value(p);
+            MeshGeometry3D* mesh = dynamic_cast<MeshGeometry3D*>(m->ModelGroup()->Children.at(0));
+            QList<RayHitResult*> results = hitMap.value(p);
             for (int i = 0; i < trianglesOfIntersection.count(); i++)
             {
-                int ind = trianglesOfIntersection.at(i).Index();
-                RayHitResult result(mesh, pointsOfIntersection.at(i), Point3D::DistanceTo(pointsOfIntersection.at(i), a), 3 * ind, 3 * ind + 1, 3 * ind + 2);
-                result.setHeight(pointsOfIntersection.at(i).z());
+                Triangle t = trianglesOfIntersection.at(i);
+                int ind = t.Index();
+                //int ind = trianglesOfIntersection.at(i).Index();
+                RayHitResult* result = new RayHitResult(mesh, pointsOfIntersection.at(i), Point3D::DistanceTo(pointsOfIntersection.at(i), a), 3 * ind, 3 * ind + 1, 3 * ind + 2);
+                result->setHeight(pointsOfIntersection.at(i).z());
 
                 //add to list while keeping sorted by intersection height
                 int insertionLocation = -1;
@@ -116,7 +124,9 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
                 {
                     for (int ii = 1; ii < results.count(); ii++)
                     {
-                        if (result.Height() < results.at(ii).Height())
+                        RayHitResult* rhr = results.at(ii);
+                        if (result->Height() < rhr->Height())
+                            //if (result.Height() < results.at(ii).Height())
                         {
                             insertionLocation = ii;
                             break;
@@ -133,13 +143,13 @@ void SupportGenerator::DoHitTest(Visual3D* hitModel, QList<QPointF> list, double
 
     foreach(QPointF p, hitMap.keys())
     {
-        QList<RayHitResult> list = hitMap.value(p);
+        QList<RayHitResult*> list = hitMap.value(p);
         if (list.isEmpty())
             hitMap.remove(p);
     }
 }
 
-void SupportGenerator::SingleSupportRay(ModelVisual3DObservable hitModel, Point3D p)
+void SupportGenerator::SingleSupportRay(ModelVisual3DObservable* hitModel, Point3D p)
 {
     hitList.clear();
     hitList.append(QPointF(p.x(), p.y()));
@@ -174,20 +184,20 @@ void SupportGenerator::BuildBeams(SupportData data, Point3D projectedMouse, bool
                 continue;
             }
 
-            QList<RayHitResult> meshHits = data.map.value(key);
+            QList<RayHitResult*> meshHits = data.map.value(key);
             int floor = 0;
             int ceiling = meshHits.count();
 
-            Point3D origin();
+            Point3D origin = Point3D();
             if (projectedMouse != origin)
             {
                 double d = DBL_MAX;
                 int hitIndex = 0;
                 int altSurface;
 
-                foreach (RayHitResult res, meshHits)
+                foreach (RayHitResult* res, meshHits)
                 {
-                    double k = fabs(fabs(mouse.z()) - fabs(res.Height()));
+                    double k = fabs(fabs(mouse.z()) - fabs(res->Height()));
                     if (k < d)
                     {
                         d = k;
@@ -209,10 +219,10 @@ void SupportGenerator::BuildBeams(SupportData data, Point3D projectedMouse, bool
                     {
                         altSurface = hitIndex + 1;
                     }
-                    if (hitIndex + 1 == meshHits.Count) // if top hit, adjust down
+                    if (hitIndex + 1 == meshHits.count()) // if top hit, adjust down
                     {
-                        hitIndex = meshHits.Count - 2;
-                        altSurface = meshHits.Count - 3;
+                        hitIndex = meshHits.count() - 2;
+                        altSurface = meshHits.count() - 3;
                     }
                 }
 
@@ -235,10 +245,16 @@ void SupportGenerator::BuildBeams(SupportData data, Point3D projectedMouse, bool
             else
             {
                 int index = 0;
-                for (int i = 0; i < meshHits.Count; i++)
-                    if (segment.point.z() == meshHits.at(i).Height())
+                for (int i = 0; i < meshHits.count(); i++)
+                {
+                    RayHitResult* rhr = meshHits.at(i);
+                    //if (segment.point.z() == meshHits.at(i).Height())
+                    if (segment.point.z() == rhr->Height())
+                    {
                         if (i > 0 && i < meshHits.count())
                             index = i - 1;
+                    }
+                }
                 floor = index;
                 ceiling = index + 2;
             }
@@ -256,10 +272,14 @@ void SupportGenerator::BuildBeams(SupportData data, Point3D projectedMouse, bool
                     meshHitTopIndex = ceiling;
                 }
 
-                double topHitZ = meshHits.at(meshHitTopIndex).Height();
-                double bottomHitZ = meshHits.at(bIndex).Height();
+                RayHitResult* rhr;
+                rhr = meshHits.at(meshHitTopIndex);
+                double topHitZ = rhr->Height();
+                rhr = meshHits.at(bIndex);
+                double bottomHitZ = rhr->Height();
 
-                MeshGeometry3D supportMesh;
+                MeshGeometry3D* supportMesh;
+                //rhr = meshHits.at(meshHitTopIndex);
                 if (meshHitTopIndex == bIndex)
                 {
                     supportMesh = GetSingleSupport(hit2D, meshHits.at(meshHitTopIndex), cyl, hitModel, 0, forceBuild);
@@ -270,7 +290,7 @@ void SupportGenerator::BuildBeams(SupportData data, Point3D projectedMouse, bool
                 }
 
                 segment.cylinder = cyl;
-                if (supportMesh.Positions.isEmpty())
+                if (supportMesh->Positions.isEmpty())
                 {
                     group.removeAt(j);
                 }
@@ -307,14 +327,15 @@ Vector3D SupportGenerator::GetNegatedNormal(RayHitResult *hit)
 
     if (fabs(hitNormal.z() - 1) <= 0)
     {
-        hitNormal.x() += 1e-12;
+        hitNormal.setX(hitNormal.x() + 1e-12);
+        //hitNormal.x() += 1e-12;
         hitNormal.normalize();
     }
     return hitNormal;
 }
 
 MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult* meshHit, Cylinder &cylinder,
-                                                   Visual3D hitModel, RayHitResult* meshHitB, bool forceBuild)
+                                                   Visual3D* hitModel, RayHitResult* meshHitB, bool forceBuild)
 {
     cylinder.Clear();
 
@@ -328,7 +349,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
     Point3D displacedCylBottom;
     QList<double> diameters_T;
     QList<Point3D> path_T;
-    double topHit = meshHit.PointHit().z();
+    double topHit = meshHit->PointHit().z();
     Vector3D hitNormalT = GetNegatedNormal(meshHit);
     Point3D topOrigin(center.x(), center.y(), topHit);
 
@@ -387,7 +408,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
         double cylBottomZ = bottomHit;
 
         Vector3D hitNormalB;
-        Point3D bottomOrigin (center.X, center.Y, bottomHit);
+        Point3D bottomOrigin (center.x(), center.y(), bottomHit);
         QList<double> diameters_B;
         QList<Point3D> path_B;
         if (meshHitB && meshHitB->MeshHit())
@@ -395,11 +416,11 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
             hitNormalB = GetNegatedNormal(meshHitB);
             bottomOrigin = bottomOrigin - Vector3D::Multiply (hitNormalB, touchPointWithdrawal);
             ConstructCorner (bottomOrigin, hitNormalB, displacedCylBottom, path_B, diameters_B, Vector3D());
-            cylBottomZ = displacedCylBottom.Z;
+            cylBottomZ = displacedCylBottom.z();
         }
 
         // adjust for desired contact with mesh
-        Vector3D adjustedTopOrigin = topOrigin - Vector3D::Multiply (hitNormalT, touchPointWithdrawal);
+        Point3D adjustedTopOrigin = topOrigin - Vector3D::Multiply (hitNormalT, touchPointWithdrawal);
 
         // If top normal is facing down, then don't construct support
         //if (hitNormalT.Z < 0) return null;
@@ -423,7 +444,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
 
             QList<Point3D> supportPath = path_T.mid(1, path_T.count() - 1);
             QList<double> supportDiameters = diameters_T.mid (1, path_T.count() - 1);
-            if (meshHitB && meshHitB.MeshHit())
+            if (meshHitB && meshHitB->MeshHit())
             {
                 for (int i = path_B.count() - 1; i > 0; i--)
                 {
@@ -437,7 +458,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
                 supportDiameters.append(supportCylRad * 2);
             }
 
-            if (!TestSupportModelIntersection (supportPath, supportDiameters, modelEntity))
+            if (!TestSupportModelIntersection (supportPath, supportDiameters, me))
                 break;
 
             if (fabs(angleGuess) > 150) {
@@ -447,7 +468,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
                 }
                 else
                 {
-                    qebug() << "No good elbow angle. ABORT";
+                    qDebug() << "No good elbow angle. ABORT";
                     return 0;
                 }
             }
@@ -463,9 +484,9 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
         cylinder = cyl;
 
         // Add bottom cone for auto generation (mesh-mesh internal supports)
-        if (bottomHit != MVM->Parameters().BaseSupportHeight() && meshHitB && meshHitB.MeshHit)
+        if (bottomHit != MVM->Parameters().BaseSupportHeight() && meshHitB && meshHitB->MeshHit())
         {
-            for (int i = path_B.Count; i > 0; i--)
+            for (int i = path_B.count(); i > 0; i--)
             {
                 path_T.append(path_B.at(i - 1));
                 diameters_T.append(diameters_B.at(i - 1));
@@ -474,7 +495,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
         else
         {
             // Mesh-Base or Mesh to Z-plane
-            displacedCylBottom = Point3D (displacedCylTop.X, displacedCylTop.Y, bottomHit);
+            displacedCylBottom = Point3D (displacedCylTop.x(), displacedCylTop.y(), bottomHit);
 
 
             if (supportOperationType == sotBasePerSupport || supportOperationType == sotNone || supportOperationType == sotElevateNoBase)
@@ -504,7 +525,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
             end -= 1;
         QList<Point3D> testPath = path_T.mid(2, end - 3);
         QList<double> testDiam = diameters_T.mid(2, end - 3);
-        if (TestSupportModelIntersection (testPath, testDiam, modelEntity))
+        if (TestSupportModelIntersection (testPath, testDiam, me))
         {
             if (!forceBuild)
             {
@@ -522,7 +543,7 @@ MeshGeometry3D* SupportGenerator::GetSingleSupport(QPointF center, RayHitResult*
         MVM->CylinderDiams.append(diameters_T);
 
         MeshBuilder* meshBuilder = new MeshBuilder (true, true);
-        BuildSupport (path_T, diameters_T, MeshBuilder.GetCircle (circularThetaDiv), meshBuilder);
+        BuildSupport (path_T, diameters_T, MeshBuilder::GetCircle(circularThetaDiv), meshBuilder);
 
         MeshGeometry3D* outMesh = meshBuilder->ToMesh(false);
         //outMesh.TextureCoordinates[0] = textureZero;
@@ -621,35 +642,35 @@ void SupportGenerator::ConstructCorner(Point3D hitOrigin, Vector3D hitNormal, Po
     }
 }
 
-bool SupportGenerator::TestSupportModelIntersection(QList<Point3D> origSupportPath, QList<double> origDiameters, ModelEntity modelEntity)
+bool SupportGenerator::TestSupportModelIntersection(QList<Point3D> origSupportPath, QList<double> origDiameters, ModelEntity* modelEntity)
 {
-    QList<Point3D>(origSupportPath);
+    QList<Point3D> supportPath(origSupportPath);
     QList<double> diameters(origDiameters);
     MeshBuilder* supportMeshBuilder = new MeshBuilder(true, true);
     QList<double> expandedDiameters;
     for (int i = 0; i < diameters.count(); i++)
         expandedDiameters.append(diameters.at(i) + 2 * IntersectionSafetyDistance);
-    BuildSupport(supportPath, expandedDiameters, MeshBuilder.GetCircle(circularThetaDiv), supportMeshBuilder);
+    BuildSupport(supportPath, expandedDiameters, MeshBuilder::GetCircle(circularThetaDiv), supportMeshBuilder);
     MeshGeometry3D* supportMesh = supportMeshBuilder->ToMesh(true);
     AABBTree supportAABB;
-    supportAABB.PopulateFromMesh(*supportMesh, Transform3D.Identity());
+    supportAABB.PopulateFromMesh(supportMesh, Transform3D::Identity());
 
-    bool result = supportAABB.Intersect(modelEntity.Tree());
+    bool result = supportAABB.Intersect(modelEntity->Tree());
     return result;
 }
 
-void SupportGenerator::BuildSupport(QList<Point3D> path, QList<double> diameters, QList<QPointF> section, MeshBuilder meshBuilder)
+void SupportGenerator::BuildSupport(QList<Point3D> path, QList<double> diameters, QList<QPointF> section, MeshBuilder* meshBuilder)
 {
     if (diameters.isEmpty())
     {
         throw new InvalidOperationException("cannot be zero diameters");
     }
-    if (path.Count < 2 || section.Count < 2)
+    if (path.count() < 2 || section.count() < 2)
     {
         return;
     }
 
-    if (diameters != null && diameters.Count == path.Count)
+    if (diameters.count() == path.count())
     {
         if (diameters.at(0) != 0)
         {
@@ -663,7 +684,7 @@ void SupportGenerator::BuildSupport(QList<Point3D> path, QList<double> diameters
         }
     }
 
-    int index0 = meshBuilder.Positions().count();
+    int index0 = meshBuilder->Positions().count();
 
     int next = 1;
     while (next < path.count() && path.at(0) == path.at(next))
@@ -693,20 +714,20 @@ void SupportGenerator::BuildSupport(QList<Point3D> path, QList<double> diameters
         {
             Vector3D w = (section.at(j).x() * u * r) + (section.at(j).y() * v * r);
             Point3D q = path.at(i) + w;
-            meshBuilder.Positions().append(q);
-            if (!meshBuilder.Normals()->isEmpty())
+            meshBuilder->Positions().append(q);
+            if (!meshBuilder->Normals()->isEmpty())
             {
                 w.normalize();
-                meshBuilder.Normals()->append(w);
+                meshBuilder->Normals()->append(w);
             }
 
-            if (!meshBuilder.TextureCoordinates()->isEmpty())
+            if (!meshBuilder->TextureCoordinates()->isEmpty())
             {
-                meshBuilder.TextureCoordinates()->append(QPointF());
+                meshBuilder->TextureCoordinates()->append(QPointF());
             }
 
         }
     }
 
-    meshBuilder.AddRectangularMeshTriangleIndices(index0, path.count(), section.count(), true, false);
+    meshBuilder->AddRectangularMeshTriangleIndices(index0, path.count(), section.count(), true, false);
 }

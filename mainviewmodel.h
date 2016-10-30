@@ -3,7 +3,6 @@
 
 #include "point3d.h"
 #include "mvmparameters.h"
-//#include "modelentity.h"
 #include "support.h"
 
 namespace CreateCore

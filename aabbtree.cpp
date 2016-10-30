@@ -580,9 +580,9 @@ bool AABBTree::Intersect(LineSeg l, AABBNode *root)
     return false;
 }
 
-bool AABBTree::Intersect(AABBTree tree)
+bool AABBTree::Intersect(AABBTree* tree)
 {
-    return Intersect(_root, tree.Root());
+    return Intersect(_root, tree->Root());
 }
 
 void AABBTree::PopulateFromMesh(MeshGeometry3D* m, Transform3D* transform)

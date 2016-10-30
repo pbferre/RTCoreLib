@@ -125,7 +125,7 @@ public:
     bool Intersect(LineSeg l, QList<Triangle> ts, QList<Point3D> ps);
     bool Intersect(LineSeg l, AABBNode* root, QList<Triangle> ts, QList<Point3D> ps);
     bool Intersect(LineSeg l, AABBNode* root);
-    bool Intersect(AABBTree tree);
+    bool Intersect(AABBTree* tree);
     QList<Triangle> ClosestTriangles(Point3D p, double maxDist = DBL_MAX);
     Point3D ClosestPoint(Point3D p, double maxDist = DBL_MAX);
     bool IsInterior(Point3D p);

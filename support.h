@@ -82,9 +82,9 @@ public:
         return v;
     }
 
-    static Transform3D Identity()
+    static Transform3D* Identity()
     {
-        return Transform3D();
+        return new Transform3D();
     }
 };
 
@@ -245,7 +245,7 @@ struct SupportDataSegment
 
 struct SupportData
 {
-    QMap<QPointF, QList<RayHitResult>> map;
+    QMap<QPointF, QList<RayHitResult*>> map;
     QList<QList<SupportDataSegment>> supportDataSegments;
 };
 
